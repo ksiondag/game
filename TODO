@@ -7,3 +7,6 @@ DONE Move rectangle based on user click
 DONE Adjust velocity of rectangle based on user click
 DONE Implement gravity into system
 Develop "level" to play around in to develop physics system
+    DONE Implement platforms
+        Create collision capabilities with platforms
+Make screen bigger
