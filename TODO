@@ -1,1 +1,9 @@
-Blank fucking screen.
+DONE Blank fucking screen.
+    DONE Install pygame
+        DONE Install virtualenv
+DONE install ipython
+DONE Render rectangle in blank fucking screen
+DONE Move rectangle based on user click
+DONE Adjust velocity of rectangle based on user click
+DONE Implement gravity into system
+Develop "level" to play around in to develop physics system

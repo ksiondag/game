@@ -4,6 +4,10 @@ import sys
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 
+GRAVITY = 1.0
+GROUND = 480
+WALL = 640
+
 class Character:
     
     def __init__( self, x, y ):
@@ -12,62 +16,67 @@ class Character:
         self.pos_x = x
         self.pos_y = y
 
-        self.tar_x = x
-        self.tar_y = y
-
         self.vel_x = 0
         self.vel_y = 0
 
-        self.acc_x = 0
-        self.acc_y = 0
+        self.width  = 20
+        self.height = 20
+
+        self.touching_ground = False
 
     def move_event( self, target_location ):
         '''
         '''
-        self.tar_x, self.tar_y = target_location
 
-        distance = (self.tar_x - self.pos_x)**2 + (self.tar_y - self.pos_y)**2
-        distance = distance**0.5
+        if self.touching_ground:
+            target_x, target_y = target_location
 
-        self.vel_x = 10*(self.tar_x - self.pos_x)/distance
-        self.vel_y = 10*(self.tar_y - self.pos_y)/distance
+            self.vel_x = (target_x - self.pos_x)/15
+            self.vel_y = (target_y - self.pos_y)/10
+
+        # TODO: in-air user controls
+        else:
+            pass
 
     def update( self ):
         '''
         '''
-        if self.vel_x != 0 and self.tar_x != self.pos_x:
-            distance_x = (self.tar_x - self.pos_x) > 0
-            velocity_x  = self.vel_x > 0
+        self.pos_x += self.vel_x
+        self.pos_y += self.vel_y
 
-            if distance_x == velocity_x:
-                self.pos_x += self.vel_x
-            else:
-                self.pos_x = self.tar_x
+        if self.pos_y + self.height < GROUND:
+            self.vel_y += GRAVITY
+            self.touching_ground = False
         else:
             self.vel_x = 0
-
-        if self.vel_y != 0 and self.tar_y != self.pos_y:
-            distance_y = (self.tar_y - self.pos_y) > 0
-            velocity_y  = self.vel_y > 0
-
-            if distance_y == velocity_y:
-                self.pos_y += self.vel_y
-            else:
-                self.pos_y = self.tar_y
-        else:
             self.vel_y = 0
+
+            self.pos_y = GROUND - self.height
+
+            self.tar_x = self.pos_x
+            self.tar_y = self.pos_y
+
+            self.touching_ground = True
+        
+        if self.pos_x < 0:
+            self.vel_x = 0
+            self.pos_x = 0
+        if self.pos_x + self.width > WALL:
+            self.vel_x = 0
+            self.pos_x = WALL - self.width
 
     def display( self, screen ):
         '''
         '''
-        pygame.draw.rect( screen, WHITE, (self.pos_x, self.pos_y, 20, 20) )
+        pygame.draw.rect( screen, WHITE, (self.pos_x, self.pos_y, 
+                                          self.width, self.height) )
 
 def main():
     '''
     '''
     pygame.init()
     screen = pygame.display.set_mode((640,480))
-    pygame.display.set_caption('Render Rectangle in Blank Fucking Screen')
+    pygame.display.set_caption('Controlable Rectangle in Blank Screen')
 
     clock = pygame.time.Clock()
 
@@ -94,7 +103,7 @@ def main():
         # Draw objects ...
         character.display( screen )
 
-        # Update the scren
+        # Update the screen
         pygame.display.flip()
 
 if __name__ == '__main__':
