@@ -8,5 +8,6 @@ DONE Adjust velocity of rectangle based on user click
 DONE Implement gravity into system
 Develop "level" to play around in to develop physics system
     DONE Implement platforms
-        Create collision capabilities with platforms
-Make screen bigger
+    DONE Create collision capabilities with platforms
+    Improve collision capabilities with platforms using
+        Rewrite Thing class to use built-in pygame.rect capabilities
