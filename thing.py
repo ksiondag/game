@@ -1,41 +1,39 @@
 import pygame
 import constants
 
-class Thing:
+class Thing( pygame.rect.Rect ):
     
-    def __init__( self, x, y, width, height, color ):
+    def __init__( self, left, top, width, height, color ):
         '''
         '''
-        self.x = x
-        self.y = y
-
-        self.vel_x = 0
-        self.vel_y = 0
-
-        self.width  = width
-        self.height = height
-
+        pygame.rect.Rect.__init__( self, left, top, width, height )
         self.color = color
+        self.stop()
 
     def stop( self ):
+        self.stop_x()
+        self.stop_y()
+
+    def stop_x( self ):
         self.vel_x = 0
+
+    def stop_y( self ):
         self.vel_y = 0
 
+    def falling( self ):
+        return self.vel_y > 0
+
+    def rising( self ):
+        return self.vel_y < 0
+
     def collide( self, other ):
-        '''
-        '''
-        pass
+        return self.rect.collide( other.rect )
 
     def update( self ):
-        '''
-        '''
         pass
 
     def display( self, screen ):
-        '''
-        '''
-        pygame.draw.rect( screen, self.color, (self.x,     self.y, 
-                                               self.width, self.height) )
+        pygame.draw.rect( screen, self.color, self )
 
 class Platform( Thing ):
     pass
@@ -58,6 +56,8 @@ class Player( Character ):
         if self.grounded:
             target_x, target_y = target_location
 
+            # NOTE: this needs to be tweaked very carefully
+            # NOTE: this may need to be a lot more complicated
             self.vel_x = (target_x - self.x)/15
             self.vel_y = (target_y - self.y)/10
             
@@ -66,10 +66,6 @@ class Player( Character ):
         # TODO: in-air user controls
         else:
             pass
-
-    def collision_event( self, other ):
-        # TODO: when colliding with other object, react appropriately
-        pass
 
     def update( self ):
         '''

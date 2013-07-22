@@ -9,5 +9,5 @@ DONE Implement gravity into system
 Develop "level" to play around in to develop physics system
     DONE Implement platforms
     DONE Create collision capabilities with platforms
-    Improve collision capabilities with platforms using
-        Rewrite Thing class to use built-in pygame.rect capabilities
+    DONE Improve collision capabilities with platforms
+        DONE Rewrite Thing class to use built-in pygame.rect capabilities

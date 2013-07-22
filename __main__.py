@@ -6,34 +6,50 @@ import constants
 
 def check_collision( thing1, thing2 ):
 
-    # Rectangles overlap if thing2 pushes on thing1 in all directions
-    push_right = thing2.x + thing2.width  - thing1.x
-    push_left  = thing1.x + thing1.width  - thing2.x
-    push_down  = thing2.y + thing2.height - thing1.y
-    push_up    = thing1.y + thing1.height - thing2.y
+    def push_left( vertical_overlap ):
+        right_overlap = abs( thing1.right - thing2.left )
+
+        if right_overlap < vertical_overlap:
+            thing1.stop_x()
+            thing1.right = thing2.left
+            return True
+
+        return False
+
+    def push_right( vertical_overlap ):
+        left_overlap = abs( thing1.left - thing2.right )
+
+        if left_overlap < vertical_overlap:
+            thing1.stop_x()
+            thing1.left = thing2.right
+            return True
+
+        return False
+
+    def push_up():
+        # thing1 lands on thing2
+        thing1.stop()
+        thing1.bottom = thing2.top
+        thing1.grounded = True
+
+    def push_down():
+        thing1.stop_y()
+        thing1.top = thing2.bottom
 
     # Rectangles overlap, they have collided
-    if push_right > 0 and push_left > 0 and push_up > 0 and push_down > 0:
-        print push_right, push_left, push_up, push_down
-        # Path of least resistance to undo overlap
-        min_push = min( push_right, push_left, push_up, push_down )
+    if thing1.colliderect( thing2 ):
 
-        # Elastic bounce off wall of thing2
-        if push_right == min_push or push_left == min_push:
-            thing1.vel_x = -thing1.vel_x
+        # check the nature of the collision, manipulate thing1 accordingly
+        if thing1.falling():
+            fall_overlap = abs( thing1.bottom - thing2.top )
+            if not push_left(fall_overlap) and not push_right(fall_overlap):
+                push_up()
 
-        # thing1 lands on thing2
-        if push_up == min_push:
-            print "Pushing up", thing1.vel_y
-            if thing1.vel_y > 0:
-                thing1.stop()
-            thing1.y = thing2.y - thing1.height
-            thing1.grounded = True
+        elif thing1.rising():
+            rise_overlap = abs( thing1.top - thing2.bottom )
+            if not push_left(rise_overlap) and not push_right(rise_overlap):
+                push_down()
 
-        # Elastic bounce off roof of thing2
-        if push_down == min_push:
-            print "Pushing down"
-            thing1.vel_y = -thing1.vel_y
 
 def main():
     '''
@@ -45,8 +61,8 @@ def main():
     clock = pygame.time.Clock()
 
     player = thing.Player( 300, 200, 20, 40, constants.WHITE )
-    platforms = [ thing.Platform(           -10,     constants.GROUND-10,
-                                 constants.WALL + 10,                 10,
+    platforms = [ thing.Platform(                -10, constants.GROUND-10,
+                                 constants.WALL + 20,                  10,
                                  constants.GREEN ) ]
     platforms.append( thing.Platform( 260, 250, 100, 10, constants.GREEN ) )
 
