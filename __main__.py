@@ -9,7 +9,7 @@ def check_collision( thing1, thing2 ):
     def push_left( vertical_overlap ):
         right_overlap = abs( thing1.right - thing2.left )
 
-        if right_overlap < vertical_overlap:
+        if thing1.moving_right() and right_overlap < vertical_overlap:
             thing1.stop_x()
             thing1.right = thing2.left
             return True
@@ -19,7 +19,7 @@ def check_collision( thing1, thing2 ):
     def push_right( vertical_overlap ):
         left_overlap = abs( thing1.left - thing2.right )
 
-        if left_overlap < vertical_overlap:
+        if thing1.moving_left() and left_overlap < vertical_overlap:
             thing1.stop_x()
             thing1.left = thing2.right
             return True
@@ -60,11 +60,12 @@ def main():
 
     clock = pygame.time.Clock()
 
-    player = thing.Player( 300, 200, 20, 40, constants.WHITE )
+    player = thing.Player( 10, constants.GROUND-50, 20, 40, constants.WHITE )
     platforms = [ thing.Platform(                -10, constants.GROUND-10,
                                  constants.WALL + 20,                  10,
                                  constants.GREEN ) ]
     platforms.append( thing.Platform( 260, 250, 100, 10, constants.GREEN ) )
+    platforms.append( thing.Platform( 400, 250, 10, 100, constants.GREEN ) )
 
     while True:
         # Update clock

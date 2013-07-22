@@ -26,6 +26,12 @@ class Thing( pygame.rect.Rect ):
     def rising( self ):
         return self.vel_y < 0
 
+    def moving_right( self ):
+        return self.vel_x > 0
+
+    def moving_left( self ):
+        return self.vel_x < 0
+
     def collide( self, other ):
         return self.rect.collide( other.rect )
 
