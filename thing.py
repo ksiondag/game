@@ -35,7 +35,7 @@ class Thing( pygame.rect.Rect ):
     def collide( self, other ):
         return self.rect.collide( other.rect )
 
-    def update( self ):
+    def update( self, dt ):
         pass
 
     def display( self, screen ):
@@ -55,7 +55,13 @@ class Player( Character ):
         Character.__init__( self, *args, **kwargs )
         self.grounded = False
 
-    def move_event( self, target_location ):
+    def rising( self ):
+        return self.vel_y + constants.GRAVITY/2 < 0
+
+    def falling( self ):
+        return self.vel_y + constants.GRAVITY/2 > 0
+
+    def jump_event( self, target_location ):
         '''
         '''
 
@@ -64,8 +70,8 @@ class Player( Character ):
 
             # NOTE: this needs to be tweaked very carefully
             # NOTE: this may need to be a lot more complicated
-            self.vel_x = (target_x - self.x)/15
-            self.vel_y = (target_y - self.y)/10
+            self.vel_x = 50*(target_x - self.x)/15
+            self.vel_y = 50*(target_y - self.y)/15
             
             self.grounded = False
 
@@ -73,15 +79,14 @@ class Player( Character ):
         else:
             pass
 
-    def update( self ):
+    def update( self, dt ):
         '''
         '''
-        self.x += self.vel_x
-        self.y += self.vel_y
+        self.x += self.vel_x * dt
 
         if not self.grounded:
-            self.vel_y += constants.GRAVITY
-            self.grounded = False
+            self.y += (self.vel_y + constants.GRAVITY/2) * dt
+            self.vel_y += constants.GRAVITY * dt
 
         if self.x < 0:
             self.vel_x = 0

@@ -69,7 +69,7 @@ def main():
 
     while True:
         # Update clock
-        clock.tick( constants.FPS )
+        dt = clock.tick( constants.FPS ) / 1000.
 
         # Clear the screen
         screen.fill( constants.BLACK )
@@ -77,15 +77,15 @@ def main():
         # Check input
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                player.move_event( pygame.mouse.get_pos() )
+                player.jump_event( pygame.mouse.get_pos() )
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
         # Update everything
-        player.update()
+        player.update( dt )
         for platform in platforms:
-            platform.update()
+            platform.update( dt )
             check_collision( player, platform )
 
         # Display everything

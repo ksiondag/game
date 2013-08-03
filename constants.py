@@ -7,7 +7,7 @@ BLUE  =   0,   0, 255
 FPS = 50
 
 # TODO: movement based variables need to be based on FPS
-GRAVITY = 1.0
+GRAVITY = 500.0
 
 GROUND = 480
 WALL = 640
