@@ -32,8 +32,51 @@ class Thing( pygame.rect.Rect ):
     def moving_left( self ):
         return self.vel_x < 0
 
-    def collide( self, other ):
-        return self.rect.collide( other.rect )
+    def check_collision( self, other ):
+
+        def left( vertical_overlap ):
+            right_overlap = abs( self.right - other.left )
+
+            if self.moving_right() and right_overlap < vertical_overlap:
+                self.stop_x()
+                self.right = other.left
+                return True
+
+            return False
+
+        def right( vertical_overlap ):
+            left_overlap = abs( self.left - other.right )
+
+            if self.moving_left() and left_overlap < vertical_overlap:
+                self.stop_x()
+                self.left = other.right
+                return True
+
+            return False
+
+        def up():
+            # self lands on other
+            self.stop()
+            self.bottom = other.top
+            self.grounded = True
+
+        def down():
+            self.stop_y()
+            self.top = other.bottom
+
+        # Rectangles overlap, they have collided
+        if self.colliderect( other ):
+
+            # check the nature of the collision, manipulate self accordingly
+            if self.falling():
+                fall_overlap = abs( self.bottom - other.top )
+                if not left(fall_overlap) and not right(fall_overlap):
+                    up()
+
+            elif self.rising():
+                rise_overlap = abs( self.top - other.bottom )
+                if not left(rise_overlap) and not right(rise_overlap):
+                    down()
 
     def update( self, dt ):
         pass
@@ -45,7 +88,11 @@ class Platform( Thing ):
     pass
 
 class Character( Thing ):
-    pass
+    def rising( self ):
+        return self.vel_y + constants.GRAVITY/2 < 0
+
+    def falling( self ):
+        return self.vel_y + constants.GRAVITY/2 > 0
 
 class Player( Character ):
 
@@ -54,12 +101,6 @@ class Player( Character ):
         '''
         Character.__init__( self, *args, **kwargs )
         self.grounded = False
-
-    def rising( self ):
-        return self.vel_y + constants.GRAVITY/2 < 0
-
-    def falling( self ):
-        return self.vel_y + constants.GRAVITY/2 > 0
 
     def jump_event( self, target_location ):
         '''
