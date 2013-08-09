@@ -167,7 +167,7 @@ class Player( Character ):
         '''
         Character.__init__( self, *args, **kwargs )
         self.grounded = False
-        #self.max_velocity = 40
+        self.max_velocity = 20
 
     def jump_event( self, target_location ):
         '''
@@ -176,14 +176,37 @@ class Player( Character ):
         if self.grounded:
             tar_x, tar_y = physics.location_pixels_to_meters(*target_location)
 
-            # NOTE: this needs to be tweaked very carefully
-            # NOTE: this may need to be a lot more complicated
-            #self.vel_x = tar_x - self.x
-            #self.vel_y = tar_y - self.y
-
+            # Find y velocity, time
             diff_y = tar_y - self.bottom
             if diff_y > 0:
                 self.vel_y = (-2*constants.GRAVITY*diff_y)**(0.5)
+
+            # TODO: all of this can be optimized
+            vel_y_over_gravity = self.vel_y/constants.GRAVITY
+
+            plus_or_minus = (self.vel_y**2 + 2*constants.GRAVITY*diff_y)
+            if plus_or_minus > 0:
+                plus_or_minus = plus_or_minus**(0.5)
+            else:
+                plus_or_minus = 0
+            plus_or_minus /= constants.GRAVITY
+
+            pos_time_y = [(-vel_y_over_gravity - plus_or_minus),
+                          (-vel_y_over_gravity + plus_or_minus)]
+
+            time_y = min( [t for t in pos_time_y if t >= 0] )
+
+            # Find x velocity, time
+            # TODO: use center x
+            self.vel_x = (tar_x - self.x)/time_y
+
+            if abs( self.vel_x ) > self.max_velocity:
+                if self.vel_x >= 0:
+                    self.vel_x = self.max_velocity
+                else:
+                    self.vel_x = -self.max_velocity
+                time_x = (tar_x - self.x)/self.vel_x
+                self.vel_y = diff_y/time_x - 0.5*constants.GRAVITY*time_x
 
             self.grounded = False
 
@@ -194,7 +217,16 @@ class Player( Character ):
     def update( self, dt ):
         '''
         '''
+        self.x = self.x + self.vel_x * dt
+
         if not self.grounded:
             self.y += self.vel_y*dt + 0.5*constants.GRAVITY*dt*dt
             self.vel_y += constants.GRAVITY*dt
+
+        if self.x < 0:
+            self.vel_x = 0
+            self.x = 0
+        if self.x + self.width > constants.WALL:
+            self.vel_x = 0
+            self.x = constants.WALL - self.width
 
