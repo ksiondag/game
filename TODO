@@ -12,4 +12,8 @@ DONE Develop "level" to play around in to develop physics system
     DONE Improve collision capabilities with platforms
         DONE Rewrite Thing class to use built-in pygame.rect capabilities
 Implement intuitive jumping arc for left mouse-button
-    Implement dt into physics subsystem
+    DONE Implement dt into physics subsystem
+    DONE Implement algebraic physics into jump
+    DONE Implement rational up-down left-right physics that translate to physics
+    DONE Implement better vel initialization to reach y value of clicked target
+    Implement proper x velocity for same purpose

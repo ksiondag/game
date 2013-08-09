@@ -1,8 +1,9 @@
 import pygame
 import sys
 
-import thing
 import constants
+import physics
+import thing
 
 
 def main():
@@ -33,6 +34,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 player.jump_event( pygame.mouse.get_pos() )
             if event.type == pygame.QUIT:
+                print
                 pygame.quit()
                 sys.exit()
 
@@ -40,7 +42,7 @@ def main():
         player.update( dt )
         for platform in platforms:
             platform.update( dt )
-            player.check_collision( :latform )
+            player.check_collision( platform )
 
         # Display everything
         player.display( screen )
@@ -49,6 +51,7 @@ def main():
 
         # Update the screen
         pygame.display.flip()
+        
 
 if __name__ == '__main__':
     main()
