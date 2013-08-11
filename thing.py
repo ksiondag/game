@@ -2,16 +2,16 @@ import pygame
 import sys
 
 import constants
-import physics
+import converion
 
 class Thing( pygame.rect.Rect ):
     
     def __init__( self, left, top, width, height, color ):
         '''
         '''
-        #left, top = physics.location_meters_to_pixels( left, top )
-        #width = physics.meters_to_pixels( width )
-        #height = physics.meters_to_pixels( height )
+        #left, top = conversion.location_meters_to_pixels( left, top )
+        #width = conversion.meters_to_pixels( width )
+        #height = conversion.meters_to_pixels( height )
 
         pygame.rect.Rect.__init__( self, left, top, width, height )
 
@@ -29,52 +29,52 @@ class Thing( pygame.rect.Rect ):
     @property
     def left( self ):
         #return pixels_to_meters( self._left )
-        return physics.pixels_to_meters( self._left )
+        return conversion.pixels_to_meters( self._left )
 
     @left.setter
     def left( self, value ):
-        self._left = physics.meters_to_pixels( value )
+        self._left = conversion.meters_to_pixels( value )
 
     @property
     def right( self ):
         #return pixels_to_meters( self._right )
-        return physics.pixels_to_meters( self._right )
+        return conversion.pixels_to_meters( self._right )
 
     @right.setter
     def right( self, value ):
-        self._right = physics.meters_to_pixels( value )
+        self._right = conversion.meters_to_pixels( value )
 
     @property
     def x( self ):
-        return physics.pixels_to_meters( self._x )
+        return conversion.pixels_to_meters( self._x )
 
     @x.setter
     def x( self, value ):
-        self._x = physics.meters_to_pixels( value )
+        self._x = conversion.meters_to_pixels( value )
 
     @property
     def top( self ):
-        return physics.vertical_pixels_to_meters( self._top )
+        return conversion.vertical_pixels_to_meters( self._top )
 
     @top.setter
     def top( self, value ):
-        self._top = physics.vertical_meters_to_pixels( value )
+        self._top = conversion.vertical_meters_to_pixels( value )
 
     @property
     def bottom( self ):
-        return physics.vertical_pixels_to_meters( self._bottom )
+        return conversion.vertical_pixels_to_meters( self._bottom )
 
     @bottom.setter
     def bottom( self, value ):
-        self._bottom = physics.vertical_meters_to_pixels( value )
+        self._bottom = conversion.vertical_meters_to_pixels( value )
 
     @property
     def y( self ):
-        return physics.vertical_pixels_to_meters( self._y )
+        return conversion.vertical_pixels_to_meters( self._y )
 
     @y.setter
     def y( self, value ):
-        self._y = physics.vertical_meters_to_pixels( value )
+        self._y = conversion.vertical_meters_to_pixels( value )
 
     def stop( self ):
         self.stop_x()
@@ -174,7 +174,7 @@ class Player( Character ):
         '''
 
         if self.grounded:
-            tar_x, tar_y = physics.location_pixels_to_meters(*target_location)
+            tar_x,tar_y=conversion.location_pixels_to_meters(*target_location)
 
             # Find y velocity, time
             diff_y = tar_y - self.bottom
@@ -220,13 +220,13 @@ class Player( Character ):
         self.x = self.x + self.vel_x * dt
 
         if not self.grounded:
-            self.y += self.vel_y*dt + 0.5*constants.GRAVITY*dt*dt
-            self.vel_y += constants.GRAVITY*dt
+            self.y += dt*(self.vel_y + 0.5*constants.GRAVITY*dt)
+            self.vel_y += dt*constants.GRAVITY
 
-        if self.x < 0:
+        if self.left < 0:
             self.vel_x = 0
-            self.x = 0
-        if self.x + self.width > constants.WALL:
+            self.left = 0
+        if self.right > conversion.pixels_to_meters(constants.WALL):
             self.vel_x = 0
-            self.x = constants.WALL - self.width
+            self.right = conversion.pixels_to_meters(constants.WALL)
 

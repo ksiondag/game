@@ -2,7 +2,6 @@ import pygame
 import sys
 
 import constants
-import physics
 import thing
 
 
