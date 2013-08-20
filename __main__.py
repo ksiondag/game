@@ -38,10 +38,10 @@ def main():
                 sys.exit()
 
         # Update everything
-        player.update( dt )
         for platform in platforms:
             platform.update( dt )
             player.check_collision( platform )
+        player.update( dt )
 
         # Display everything
         player.display( screen )

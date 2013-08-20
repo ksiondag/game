@@ -103,7 +103,6 @@ class Thing( pygame.rect.Rect ):
             if self.moving_right() and right_overlap < vertical_overlap:
                 self.stop_x()
                 self.right = other.left
-                #print 'Left'
                 return True
 
             return False
@@ -114,7 +113,6 @@ class Thing( pygame.rect.Rect ):
             if self.moving_left() and left_overlap < vertical_overlap:
                 self.stop_x()
                 self.left = other.right
-                #print 'Right'
                 return True
 
             return False
@@ -124,12 +122,10 @@ class Thing( pygame.rect.Rect ):
             self.stop()
             self.bottom = other.top
             self.grounded = True
-            #print 'Up'
 
         def down():
             self.stop_y()
             self.top = other.bottom
-            #print 'Down'
 
         # Rectangles overlap, they have collided
         if self.colliderect( other ):
@@ -182,7 +178,7 @@ class Player( Character ):
     @property
     def vel_y( self ):
         if self.grounded:
-            return -c.GRAVITY
+            return 0
         return physics.velocity( self.vy0, c.GRAVITY, self.t )
 
     # TODO
@@ -241,4 +237,41 @@ class Player( Character ):
         self.t += dt
         self.calculate_y( dt )
         self.calculate_x( dt )
+
+    def display( self, screen ):
+        Character.display( self, screen )
+        if self.grounded:
+            target_location = pygame.mouse.get_pos()
+
+            x0 = self.x
+            y0 = self.bottom
+
+            tar_x, tar_y = convert.location_pixels_to_meters(*target_location)
+
+            # Find y velocity, time
+            vy0 = physics.vy( self.bottom, tar_y, c.GRAVITY )
+            time_y = physics.ty( self.bottom, tar_y, vy0, c.GRAVITY )
+
+            # Find x velocity, time
+            vel_x = physics.vx( self.x, tar_x, time_y, self.max_velocity )
+            time_x = physics.tx( self.x, tar_x, vel_x, time_y )
+
+            # Correct y velocity to land on target y at time x
+            if time_x > time_y:
+                vy0 = physics.vy2(y0, tar_y, c.GRAVITY, time_x)
+        else:
+            x0 = self.x0
+            y0 = self.y0
+            vy0 = self.vy0
+            vel_x = self.vel_x
+
+        # TODO: display curve of jump
+        times = [ i/10. for i in range(21) ]
+        x_points = [ physics.position( x0, vel_x, 0, t ) for t in times ]
+        y_points = [ physics.position( y0, vy0, c.GRAVITY, t ) for t in times ]
+
+        points = zip( x_points, y_points )
+        points = [ convert.location_meters_to_pixels(x, y) for x, y in points ]
+
+        pygame.draw.aalines( screen, c.RED, False, points )
 

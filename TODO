@@ -19,3 +19,4 @@ DONE Implement intuitive jumping arc for left mouse-button
     DONE Implement proper x velocity for same purpose
 Debug jumping arc so that it feels more natural
     Add in visual arc graphic to illustrate the jump to player
+Switch to component-based system for ease of adding in effects
