@@ -97,49 +97,30 @@ class Thing( pygame.rect.Rect ):
 
     def check_collision( self, other ):
 
-        def left( vertical_overlap ):
-            right_overlap = abs( self.right - other.left )
-
-            if self.moving_right() and right_overlap < vertical_overlap:
-                self.stop_x()
-                self.right = other.left
-                return True
-
-            return False
-
-        def right( vertical_overlap ):
-            left_overlap = abs( self.left - other.right )
-
-            if self.moving_left() and left_overlap < vertical_overlap:
-                self.stop_x()
-                self.left = other.right
-                return True
-
-            return False
-
-        def up():
-            # self lands on other
-            self.stop()
-            self.bottom = other.top
-            self.grounded = True
-
-        def down():
-            self.stop_y()
-            self.top = other.bottom
-
         # Rectangles overlap, they have collided
         if self.colliderect( other ):
+            right_overlap = abs( self.right - other.left )
+            left_overlap  = abs( self.left - other.right )
+            fall_overlap  = abs( self.bottom - other.top )
+            rise_overlap  = abs( self.top - other.bottom )
 
-            # check the nature of the collision, manipulate self accordingly
-            if self.falling():
-                fall_overlap = abs( self.bottom - other.top )
-                if not left(fall_overlap) and not right(fall_overlap):
-                    up()
+            min_overlap = min( right_overlap, left_overlap,
+                               fall_overlap, rise_overlap )
 
-            elif self.rising():
-                rise_overlap = abs( self.top - other.bottom )
-                if not left(rise_overlap) and not right(rise_overlap):
-                    down()
+            # TODO: left and right overlaps
+            if min_overlap == fall_overlap:
+                self.bottom = other.top
+                self.stop()
+                self.grounded = True
+            elif min_overlap == rise_overlap:
+                self.top = other.bottom
+                self.stop_y()
+            elif min_overlap == left_overlap:
+                self.left = other.right
+                self.stop_x()
+            elif min_overlap == right_overlap:
+                self.right = other.left
+                self.stop_x()
 
     def update( self, dt ):
         pass
@@ -184,7 +165,10 @@ class Player( Character ):
     # TODO
     @vel_y.setter
     def vel_y( self, value ):
-        pass
+        self.t = 0
+        self.x0 = self.x
+        self.y0 = self.bottom
+        self.vy0 = value
 
     def calculate_y( self, dt ):
         #self.y += dt*(self.vel_y + 0.5*c.GRAVITY*dt)
