@@ -1,28 +1,28 @@
+import constants as c
 
-def vy( y0, ymax, a ):
-    if (ymax > y0 and a < 0) or (y0 > ymax and a > 0):
-        return (-2*a*(ymax-y0))**(0.5)
+def vp_max( p0, pmax, a ):
+    if (pmax > p0 and a < 0) or (p0 > pmax and a > 0):
+        return (-2*a*(pmax-p0))**(0.5)
     return 0.
 
-def vy2( y0, yt, a, t ):
-    return (yt - y0)/t - 0.5*a*t
+def vp( p0, pt, a, t, max_velocity=c.MAX_VELOCITY ):
+    if t == 0:
+        if pt - p0 == 0:
+            return 0
+        elif pt - p0 > 0:
+            return max_velocity + 1
+        elif pt - p0 < 0:
+            return -max_velocity - 1
+    return (pt - p0)/t - 0.5*a*t
 
-def vx( x0, xt, t, max_velocity=0 ):
-    if t != 0:
-        velocity = (xt - x0)/t
-    else:
-        velocity = max_velocity if xt >= x0 else -max_velocity
+def tp( p0, pt, v, a ):
 
-    if max_velocity and abs(velocity) > max_velocity:
-        if velocity > 0:
-            velocity = max_velocity
-        else:
-            velocity = -max_velocity
+    if a == 0:
+        if v == 0:
+            return 0
+        return (pt - p0)/v
 
-    return velocity
-
-def ty( y0, yt, v, a ):
-    plus_or_minus = (v**2 + 2*a*(yt-y0))
+    plus_or_minus = (v**2 + 2*a*(pt-p0))
     if plus_or_minus > 0:
         plus_or_minus = plus_or_minus**(0.5)
     else:
@@ -33,16 +33,6 @@ def ty( y0, yt, v, a ):
     if len( potential_times ) == 0:
         return 0
     return min( potential_times )
-
-def tx( x0, xt, v, time_y=0 ):
-    if v == 0:
-        return time_y
-
-    t = (xt - x0)/v
-
-    assert t >= 0, 'Time expectancy for travelling is less than zero.'
-
-    return t
 
 def position( p0, v, a, t ):
     return p0 + v*t + 0.5*a*t**2
