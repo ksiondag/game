@@ -4,7 +4,17 @@ import constants as c
 import convert
 import physics
 
+def update_all( dt ):
+    for thing in Thing.things:
+        thing.update( dt )
+
+def display_all( screen ):
+    for thing in Thing.things:
+        thing.display( screen )
+
 class Thing( object ):
+
+    things = []
     
     def __init__( self, left, bottom, width, height ):
         self.left = left
@@ -13,6 +23,11 @@ class Thing( object ):
         self.height = height
 
         self.components = []
+
+        Thing.things.append( self )
+
+    def __del__( self ):
+        Thing.things.remove( self )
 
     @property
     def top( self ):
@@ -49,10 +64,6 @@ class Thing( object ):
     def add_component( self, component ):
         self.components.append( component )
     
-    def add_displayable( self, displayable ):
-        self.add_component( displayable )
-        self.displayables.append( displayable )
-
     def update( self, dt ):
         for component in self.components:
             component.update( dt )

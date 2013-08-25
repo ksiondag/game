@@ -6,12 +6,12 @@ import physics
 
 class Jumpable( component.Component ):
     
-    def __init__( self, thing, max_velocity=c.MAX_VELOCITY ):
+    def __init__(self, thing, max_vx=c.MAX_VELOCITY, ax=0, ay=c.GRAVITY):
         component.Component.__init__( self, thing )
-        self.max_velocity = max_velocity
+        self.max_vx = max_vx
         self.grounded = False
         self.ax = 0
-        self.ay = 0
+        self.ay = c.GRAVITY
 
         Manager.Manager().register( Event.FIRE, self )
         Manager.Manager().register( Event.GROUNDED, self )
@@ -24,44 +24,31 @@ class Jumpable( component.Component ):
 
             xt, yt = convert.location_pixels_to_meters(*target_location)
 
-            # Find y velocity, time
-            vy = physics.vp_max( y0, yt, self.ay )
-            ty = physics.tp( y0, yt, vy, self.ay )
+            vxy = physics.vxy( x0, xt, self.ax, y0, yt, self.ay, self.max_vx )
 
-            # Find x velocity, time
-            vx = physics.vp( x0, xt, self.ax, ty, self.max_velocity )
-
-            # Correct y velocity to land on target y at time x
-            if abs(vx) > self.max_velocity:
-                if vx > 0:
-                    vx = self.max_velocity
-                else:
-                    vx = -self.max_velocity
-                tx = physics.tp( x0, xt, vx, self.ax )
-                vy = physics.vp( y0, yt, self.ay, tx )
-
-            move_event = Event( Event.MOVE, 
-                                values = (vx, vy, self.ax, self.ay),
+            move_event = Event( Event.VELOCITY,
+                                values = vxy,
                                 targets = [self.owner] )
-            grounded_event = Event( Event.GROUNDED,
-                                    values = (False, self.ax, self.ay),
-                                    targets = [self.owner] )
             
-            Manager.Manager().send_immediately( move_event )
-            Manager.Manager().send_immediately( grounded_event )
+            grounded_event = Event( Event.GROUNDED,
+                                    values = (False,),
+                                    targets = [self.owner] )
+
+            return move_event, grounded_event
 
         # TODO: in-air user controls
         else:
             pass
+        
+        return []
 
     def retrieve( self, event ):
 
         if event.name == Event.GROUNDED:
-            self.grounded, self.ax, self.ay = event.values
+            self.grounded, = event.values
         
         elif event.name == Event.FIRE:
-            self.move_event( event.values )
-
-    def update( self, dt ):
-        pass
+            return self.move_event( event.values )
+        
+        return []
 

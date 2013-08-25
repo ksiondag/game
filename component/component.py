@@ -1,12 +1,14 @@
 import pygame
 
 class Component:
+    #components = []
 
-    def __init__( self, thing, priority=-1 ):
+    def __init__( self, thing ):
         self.owner = thing
+        #Component.components.append( self )
 
     def retrieve( self, event ):
-        pass
+        return []
 
     def update( self, dt ):
         pass
