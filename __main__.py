@@ -1,17 +1,42 @@
 import pygame
 import sys
 
-import constants as c
 import component
+import constants as c
+from controller import Controller
 import convert
 import thing
 from manager import Event, Manager
+
+def quit( event ):
+    # TODO: delete everything
+    print
+    pygame.quit()
+    sys.exit()
+
+def click( event ):
+    Manager.Manager().add_event(Event(Event.CLICK, (event.pos, event.button)))
+
+def swipe( event ):
+    Manager.Manager().add_event( Event( Event.SWIPE, (event.pos, event.rel) ) )
+
+def ignore( event ):
+    return
+
+EVENT_DICT = {
+    pygame.QUIT:            quit,
+    pygame.MOUSEBUTTONDOWN: click,
+    pygame.MOUSEMOTION:     swipe,
+}
+
+def event_translator( events ):
+    for event in events:
+        EVENT_DICT.get( event.type, ignore )( event )
 
 def main():
     '''
     '''
     pygame.init()
-    manager = Manager.Manager()
 
     screen = pygame.display.set_mode((640,480))
     pygame.display.set_caption('Components Implemented')
@@ -22,11 +47,14 @@ def main():
     player = thing.Thing( 0.4, 0.2, 0.8, 1.6 )
     player.add_component( component.Movable( player ) )
     player.add_component( component.Jumpable( player ) )
-    player.add_component( component.Pathable( player ) )
     player.add_component( component.Pushable( player ) )
+    player.add_component( component.Pathable( player ) )
     player.add_component( component.Rect( player, c.WHITE ) )
 
-    platform = thing.Thing( 0, 0, convert.pixels_to_meters(c.WALL), 0.2 )
+    Controller.Controller().set_player( player )
+    manager = Manager.Manager()
+
+    platform = thing.Thing( 0, -0.2, 100, 0.2 )
     platform.add_component( component.Rect( platform, c.GREEN ) )
     platform.add_component( component.Collidable( platform ) )
 
@@ -38,6 +66,14 @@ def main():
     platform.add_component( component.Rect( platform, c.GREEN ) )
     platform.add_component( component.Collidable( platform ) )
 
+    platform = thing.Thing( -0.1, 0.0, 0.1, 20  )
+    platform.add_component( component.Rect( platform, c.GREEN ) )
+    platform.add_component( component.Collidable( platform ) )
+
+    platform = thing.Thing( 100., 0.0, 0.1, 20  )
+    platform.add_component( component.Rect( platform, c.GREEN ) )
+    platform.add_component( component.Collidable( platform ) )
+
     while True:
         # Update clock
         dt = clock.tick( c.FPS ) / 1000.
@@ -45,22 +81,8 @@ def main():
         # Clear the screen
         screen.fill( c.BLACK )
 
-        # Check input
-        # TODO: send a custom version of any event we pull in to the manager
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                manager.add_event( Event( Event.FIRE, 
-                                   values = event.pos,
-                                   targets = [player] ) )
-            elif event.type == pygame.MOUSEMOTION:
-                manager.add_event( Event( Event.AIM,
-                                   values = event.pos,
-                                   targets = [player] ) )
-            elif event.type == pygame.QUIT:
-                # TODO: delete everything
-                print
-                pygame.quit()
-                sys.exit()
+        # Check input from pygame events
+        event_translator( pygame.event.get() )
 
         Manager.Manager().send_all()
         thing.update_all( dt )

@@ -1,5 +1,4 @@
 from collidable import Collidable, Pushable
-from movable import Movable
-from controlable import Jumpable
+from movable import Movable, Jumpable
 from viewable import Rect, Pathable
 

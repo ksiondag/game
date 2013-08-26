@@ -9,10 +9,6 @@ class Movable( component.Component ):
     def __init__( self, thing, ax=0, ay=c.GRAVITY ):
         component.Component.__init__( self, thing )
 
-        self.t = 0
-        self.x0 = self.owner.x
-        self.y0 = self.owner.bottom
-
         self.vx = 0
         self.vy = 0
 
@@ -27,11 +23,11 @@ class Movable( component.Component ):
 
     def stop_x( self ):
         vx = 0
-        vy = physics.velocity( self.vy, self.ay, self.t )
+        vy = self.vy
         return Event( Event.VELOCITY, (vx,vy), targets=[self.owner] )
 
     def stop_y( self ):
-        vx = physics.velocity( self.vx, self.ax, self.t )
+        vx = self.vx
         vy = 0
         return Event( Event.VELOCITY, (vx,vy), targets=[self.owner] )
 
@@ -47,9 +43,6 @@ class Movable( component.Component ):
     def retrieve( self, event ):
 
         if event.name == Event.VELOCITY:
-            self.t = 0
-            self.x0 = self.owner.x
-            self.y0 = self.owner.bottom
             self.vx, self.vy = event.values
         elif event.name == Event.UP:
             return self.grounded_event()
@@ -61,24 +54,63 @@ class Movable( component.Component ):
         return []
     
     def calculate_x( self, dt ):
-        self.owner.x = physics.position( self.x0, self.vx, self.ax, self.t )
-
-        if self.owner.left < 0:
-            self.owner.left = 0
-            Manager.Manager().add_event( self.stop_x() )
-        if self.owner.right > convert.pixels_to_meters(c.WALL):
-            self.owner.right = convert.pixels_to_meters(c.WALL)
-            Manager.Manager().add_event( self.stop_x() )
+        self.owner.x = physics.position( self.owner.x, self.vx, self.ax, dt )
+        self.vx = physics.velocity( self.vx, self.ax, dt )
 
     def calculate_y( self, dt ):
-        self.owner.bottom = physics.position(self.y0, self.vy, self.ay, self.t)
+        y = self.owner.bottom
+        self.owner.bottom = physics.position( y, self.vy, self.ay, dt )
+        self.vy = physics.velocity( self.vy, self.ay, dt )
 
-        if self.owner.bottom < 0:
-            self.owner.bottom = 0
-            Manager.Manager().add_events( self.grounded_event() )
-    
     def update( self, dt ):
-        self.t += dt
         self.calculate_y( dt )
         self.calculate_x( dt )
+
+class Jumpable( component.Component ):
+    
+    def __init__(self, thing, max_vx=c.MAX_VELOCITY, ax=0, ay=c.GRAVITY):
+        component.Component.__init__( self, thing )
+        self.max_vx = max_vx
+        self.grounded = False
+        self.ax = 0
+        self.ay = c.GRAVITY
+
+        Manager.Manager().register( Event.FIRE, self )
+        Manager.Manager().register( Event.GROUNDED, self )
+    
+    def move_event( self, target_location ):
+
+        if self.grounded:
+            x0 = self.owner.x
+            y0 = self.owner.bottom
+
+            xt, yt = convert.location_pixels_to_meters(*target_location)
+
+            vxy = physics.vxy( x0, xt, self.ax, y0, yt, self.ay, self.max_vx )
+
+            move_event = Event( Event.VELOCITY,
+                                values = vxy,
+                                targets = [self.owner] )
+            
+            grounded_event = Event( Event.GROUNDED,
+                                    values = (False,),
+                                    targets = [self.owner] )
+
+            return move_event, grounded_event
+
+        # TODO: in-air user controls
+        else:
+            pass
+        
+        return []
+
+    def retrieve( self, event ):
+
+        if event.name == Event.GROUNDED:
+            self.grounded, = event.values
+        
+        elif event.name == Event.FIRE:
+            return self.move_event( event.values )
+        
+        return []
 

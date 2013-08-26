@@ -14,9 +14,13 @@ DONE Develop "level" to play around in to develop physics system
 DONE Implement intuitive jumping arc for left mouse-button
     DONE Implement dt into physics subsystem
     DONE Implement algebraic physics into jump
-    DONE Implement rational up-down left-right physics that translate to physics
+    DONE Implement rational up-down left-right physics
     DONE Implement better vel initialization to reach y value of clicked target
     DONE Implement proper x velocity for same purpose
-Debug jumping arc so that it feels more natural
-    Add in visual arc graphic to illustrate the jump to player
-Switch to component-based system for ease of adding in effects
+DONE Add in visual arc graphic to illustrate the jump to player
+DONE Switch to component-based system for ease of adding in effects
+DONE Debug jumping arc so that it feels more natural
+DONE Add in proper controller functionality
+Add in scrollling
+    Alter convert to make scrolling possible
+Add in json level setup file

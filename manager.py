@@ -1,9 +1,15 @@
 class Event:
     
+    CLICK = 'click'
+    SWIPE = 'swipe'
+
     AIM = 'aim'
     FIRE = 'fire'
+
     VELOCITY = 'velocity'
+
     GROUNDED = 'grounded'
+
     UP = 'up'
     DOWN = 'down'
     RIGHT = 'right'
