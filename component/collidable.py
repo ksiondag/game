@@ -41,20 +41,16 @@ class Pushable( component.Component ):
 
             if min_overlap == down_overlap:
                 self.owner.bottom = other.owner.top
-                Manager.Manager().add_event( Event(Event.UP,
-                                                   targets=[self.owner] ) )
+                Manager().add_event( Event(Event.UP, targets=[self.owner] ) )
             elif min_overlap == up_overlap:
                 self.owner.top = other.owner.bottom
-                Manager.Manager().add_event( Event( Event.DOWN,
-                                                    targets=[self.owner] ) )
+                Manager().add_event( Event(Event.DOWN, targets=[self.owner]) )
             elif min_overlap == left_overlap:
                 self.owner.left = other.owner.right
-                Manager.Manager().add_event( Event( Event.RIGHT,
-                                                   targets=[self.owner] ) )
+                Manager().add_event( Event(Event.RIGHT, targets=[self.owner]) )
             elif min_overlap == right_overlap:
                 self.owner.right = other.owner.left
-                Manager.Manager().add_event( Event( Event.LEFT,
-                                                   targets=[self.owner] ) )
+                Manager().add_event( Event(Event.LEFT, targets=[self.owner]) )
 
     # Check collision with everything
     def update( self, dt ):

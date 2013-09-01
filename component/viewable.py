@@ -1,7 +1,7 @@
 import pygame
 
 import component
-import convert
+from scrolling import Scrolling
 import constants as c
 from manager import Event, Manager
 
@@ -15,10 +15,10 @@ class Rect( component.Component ):
         self.update( 0 )
 
     def update( self, dt ):
-        left = convert.meters_to_pixels( self.owner.left )
-        top = convert.vertical_meters_to_pixels( self.owner.top )
-        width = convert.meters_to_pixels( self.owner.width )
-        height = convert.meters_to_pixels( self.owner.height )
+        left = Scrolling().x_meters_to_pixels( self.owner.left )
+        top = Scrolling().y_meters_to_pixels( self.owner.top )
+        width = Scrolling().meters_to_pixels( self.owner.width )
+        height = Scrolling().meters_to_pixels( self.owner.height )
 
         self.rect = pygame.rect.Rect( left, top, width, height )
 
@@ -42,14 +42,14 @@ class Pathable( component.Component ):
 
         self.grounded = False
 
-        Manager.Manager().register( Event.AIM,      self )
-        Manager.Manager().register( Event.GROUNDED, self )
-        Manager.Manager().register( Event.VELOCITY, self )
+        Manager().register( Event.AIM,      self )
+        Manager().register( Event.GROUNDED, self )
+        Manager().register( Event.VELOCITY, self )
 
     def retrieve( self, event ):
 
         if event.name == Event.AIM:
-            self.aim = convert.location_pixels_to_meters( *event.values )
+            self.aim = event.values
 
         elif event.name == Event.GROUNDED:
             self.grounded, = event.values
@@ -66,14 +66,10 @@ class Pathable( component.Component ):
 
         return []
 
-    def update( self, dt ):
-        # TODO
-        pass
-    
     def display( self, screen ):
 
         if self.grounded:
-            xt, yt = self.aim
+            xt, yt = Scrolling().location_pixels_to_meters( *self.aim )
             vx, vy = physics.vxy( self.x0, xt, self.ax,
                                   self.y0, yt, self.ay,
                                   self.max_vx )
@@ -86,7 +82,7 @@ class Pathable( component.Component ):
         y_points = [physics.position( self.y0, vy, self.ay, t ) for t in times]
 
         points = zip( x_points, y_points )
-        points = [ convert.location_meters_to_pixels(*xy) for xy in points ]
+        points = [Scrolling().location_meters_to_pixels(*xy) for xy in points]
 
         pygame.draw.aalines( screen, c.RED, False, points )
 

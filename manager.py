@@ -1,19 +1,25 @@
-class Event:
+class Event( object ):
+
+    # Set events
+    PLAYER = 'player'
     
+    # Controller events
     CLICK = 'click'
     SWIPE = 'swipe'
 
+    # Action events
     AIM = 'aim'
     FIRE = 'fire'
 
+    # Manipulation events
     VELOCITY = 'velocity'
-
-    GROUNDED = 'grounded'
-
     UP = 'up'
     DOWN = 'down'
     RIGHT = 'right'
     LEFT = 'left'
+
+    # State events
+    GROUNDED = 'grounded'
 
     def __init__( self, name, values=None, targets=None ):
         self.name = name
@@ -23,15 +29,7 @@ class Event:
     def __str__( self ):
         return '%s (%s)' % ( self.name, self.values )
 
-class Manager:
-
-    _MANAGER = None
-
-    @classmethod
-    def Manager( cls ):
-        if Manager._MANAGER is None:
-            Manager._MANAGER = cls()
-        return Manager._MANAGER
+class _Manager( object ):
 
     def __init__( self ):
         self.listeners = {}
@@ -62,4 +60,12 @@ class Manager:
         self.events = []
         for event in events:
             self.send_immediately( event )
-    
+
+_MANAGER = None
+
+def Manager():
+    global _MANAGER
+    if _MANAGER is None:
+        _MANAGER = _Manager()
+    return _MANAGER
+

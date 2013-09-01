@@ -1,6 +1,5 @@
 import component
 import constants as c
-import convert
 from manager import Manager, Event
 import physics
 
@@ -15,11 +14,11 @@ class Movable( component.Component ):
         self.ax = ax
         self.ay = ay
 
-        Manager.Manager().register( Event.VELOCITY,  self )
-        Manager.Manager().register( Event.UP,        self )
-        Manager.Manager().register( Event.DOWN,      self )
-        Manager.Manager().register( Event.LEFT,      self )
-        Manager.Manager().register( Event.RIGHT,     self )
+        Manager().register( Event.VELOCITY,  self )
+        Manager().register( Event.UP,        self )
+        Manager().register( Event.DOWN,      self )
+        Manager().register( Event.LEFT,      self )
+        Manager().register( Event.RIGHT,     self )
 
     def stop_x( self ):
         vx = 0
@@ -75,8 +74,8 @@ class Jumpable( component.Component ):
         self.ax = 0
         self.ay = c.GRAVITY
 
-        Manager.Manager().register( Event.FIRE, self )
-        Manager.Manager().register( Event.GROUNDED, self )
+        Manager().register( Event.FIRE, self )
+        Manager().register( Event.GROUNDED, self )
     
     def move_event( self, target_location ):
 
@@ -84,7 +83,7 @@ class Jumpable( component.Component ):
             x0 = self.owner.x
             y0 = self.owner.bottom
 
-            xt, yt = convert.location_pixels_to_meters(*target_location)
+            xt, yt = target_location
 
             vxy = physics.vxy( x0, xt, self.ax, y0, yt, self.ay, self.max_vx )
 

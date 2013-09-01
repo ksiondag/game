@@ -21,6 +21,7 @@ DONE Add in visual arc graphic to illustrate the jump to player
 DONE Switch to component-based system for ease of adding in effects
 DONE Debug jumping arc so that it feels more natural
 DONE Add in proper controller functionality
-Add in scrollling
-    Alter convert to make scrolling possible
+DONE Add in scrollling
+    DONE Alter convert to make scrolling possible
 Add in json level setup file
+Save file via serialization(???)

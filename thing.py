@@ -1,7 +1,6 @@
 import pygame
 
 import constants as c
-import convert
 import physics
 
 def update_all( dt ):

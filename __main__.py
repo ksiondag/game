@@ -4,21 +4,28 @@ import sys
 import component
 import constants as c
 from controller import Controller
-import convert
 import thing
 from manager import Event, Manager
+from scrolling import Scrolling
+
+def init():
+    pygame.init()
+    Manager()
+    Controller()
+    Scrolling()
 
 def quit( event ):
+    # TODO: serialiazation saving?
     # TODO: delete everything
     print
     pygame.quit()
     sys.exit()
 
 def click( event ):
-    Manager.Manager().add_event(Event(Event.CLICK, (event.pos, event.button)))
+    Manager().add_event(Event(Event.CLICK, (event.pos, event.button)))
 
 def swipe( event ):
-    Manager.Manager().add_event( Event( Event.SWIPE, (event.pos, event.rel) ) )
+    Manager().add_event( Event( Event.SWIPE, (event.pos, event.rel) ) )
 
 def ignore( event ):
     return
@@ -36,10 +43,10 @@ def event_translator( events ):
 def main():
     '''
     '''
-    pygame.init()
+    init()
 
-    screen = pygame.display.set_mode((640,480))
-    pygame.display.set_caption('Components Implemented')
+    screen = pygame.display.set_mode((c.PIXEL_WIDTH,c.PIXEL_HEIGHT))
+    pygame.display.set_caption('X Level Initialize')
 
     clock = pygame.time.Clock()
 
@@ -51,10 +58,9 @@ def main():
     player.add_component( component.Pathable( player ) )
     player.add_component( component.Rect( player, c.WHITE ) )
 
-    Controller.Controller().set_player( player )
-    manager = Manager.Manager()
+    Manager().send_immediately( Event( Event.PLAYER, (player,) ) )
 
-    platform = thing.Thing( 0, -0.2, 100, 0.2 )
+    platform = thing.Thing( 0, 0, 100, 0.2 )
     platform.add_component( component.Rect( platform, c.GREEN ) )
     platform.add_component( component.Collidable( platform ) )
 
@@ -84,8 +90,9 @@ def main():
         # Check input from pygame events
         event_translator( pygame.event.get() )
 
-        Manager.Manager().send_all()
+        Manager().send_all()
         thing.update_all( dt )
+        Scrolling().update( dt )
         thing.display_all( screen )
 
         pygame.display.flip()
