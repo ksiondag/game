@@ -23,5 +23,5 @@ DONE Debug jumping arc so that it feels more natural
 DONE Add in proper controller functionality
 DONE Add in scrollling
     DONE Alter convert to make scrolling possible
+Make game document in latex
 Add in json level setup file
-Save file via serialization(???)

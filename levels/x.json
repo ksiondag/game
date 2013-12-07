@@ -1,0 +1,33 @@
+{
+    "definitions": {
+        "player": {
+            "Movable": true,
+            "Jumpable": true,
+            "Pushable": true,
+            "Pathable": true,
+            "Rect": [ "WHITE" ]
+        }
+        "platform": {
+            "Rect": [ "WHITE" ],
+            "Collidable": true
+        }
+        // TODO
+        "enemy": {
+        }
+        "boss": {
+        }
+
+    }
+    "things": [
+        {
+            "name": "player",
+            "left": 0.4, "bottom": 0.2,
+            "width": 0.8, "height": 1.6,
+        },
+
+        {
+            "name": "platform",
+            "left": 10.4, "bottom": 8.8,
+            "width": 4.0, "height": 0.4,
+        }
+}
